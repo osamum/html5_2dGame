@@ -3,10 +3,35 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title></title>
+    <!--
     <script src="js/main.js"></script>
+    -->
     
+    <script>
+        //Document の準備ができたら
+        document.addEventListener("DOMContentLoaded", function () {
+            canvas = document.getElementById("playground");
+            ctx = canvas.getContext('2d');
+
+            var snow_img = new Image();
+            snow_img.src = 'img/snowSP.png';
+            snow_img.onload = function () {
+                snow_img.x = 0;
+                snow_img.y = 100;
+                ctx.drawImage(snow_img, 64, 0, 32, 32, snow_img.x, snow_img.y, 32, 32);
+
+                ctx.drawImage(snow_img, 0, 0);
+            };
+        });
+
+    </script>
+
 </head>
-<body>
+<body style="padding:0px;">
+   
     <canvas id="playground" width="320" height="400" style="background-color:black"></canvas>
+     
+    
+
 </body>
 </html>

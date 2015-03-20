@@ -1,4 +1,10 @@
-﻿body {
+﻿html {
+    overflow: hidden;
+    -ms-content-zooming: none; /* パンとズームを無効にする */
+}
+
+
+body {
     text-align: center;  
     margin: 0px;
 }
@@ -9,3 +15,5 @@ base {
    margin: 0 auto;  
 
 }
+
+

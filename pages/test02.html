@@ -4,7 +4,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title></title>
     <script>
-       
+        canvas = document.getElementById("playground");
+        ctx = canvas.getContext('2d');
+
+        snow_img = new Image();
+        snow_img.src = '/img/snow.png';
+        snow_img.onload = function () {
+            snow_img.x = getCenterPostion(canvas.clientWidth, snow_img.width);
+            snow_img.y = 0;
+            ctx.drawImage(snow_img, snow_img.x, snow_img.y);
+        };
 
     </script>
 </head>
