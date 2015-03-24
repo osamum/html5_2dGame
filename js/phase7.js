@@ -42,6 +42,8 @@
         that.y = 0;
         that.dx = 0;
         that.dy = 0;
+        that.width = width;
+        that.height = height;
 
         var _offset_x_pos = 0;
         
@@ -64,8 +66,6 @@
         //画像がロードされたら
         img.onload = function () {
             that.imageLoaded = true;
-            that.width = width;
-            that.height = height;
             that.image = img;
         };
 
@@ -75,13 +75,11 @@
         };
     };
 
-
-
     //キーイベントの取得 (キーダウン)
-    document.addEventListener("keydown", function () {
-        if (event.keyCode == LEFT_KEY_CODE) {
+    document.addEventListener("keydown", function (evnt) {
+        if (evnt.which == LEFT_KEY_CODE) {
             key_value = -3;
-        } else if (event.keyCode == RIGHT_KEY_CODE) {
+        } else if (evnt.which == RIGHT_KEY_CODE) {
             key_value = 3;
         }
     });
@@ -113,6 +111,8 @@
         }
         //雪だるまのインスタンスを生成
         img_snow_man = new Sprite('/img/snow_man.png', SNOW_MAN_PIC_SIZE, SNOW_MAN_PIC_SIZE);
+
+        img_snow_man.limit_rightPosition = getRightLimitPosition(canvas.clientWidth, img_snow_man.width);
 
         //画像のロードが完了したかどうかをチェックする関数
         loadCheck();
@@ -151,8 +151,11 @@
         //canvas をクリア
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        //img_snow_man の x 値を増分
-        img_snow_man.x += key_value;
+        if ((img_snow_man.x < img_snow_man.limit_rightPosition && key_value > 0)
+          || (img_snow_man.x >= 3 && key_value < 0)) {
+            //img_snow_man の x 値を増分
+            img_snow_man.x += key_value;
+        }
 
         var length = snow_sprites.length;
         for (var i = 0; i < length; i++) {
@@ -173,7 +176,9 @@
             snow_sprite.draw();
             
             //当たり判定
-            isHit(snow_sprite, img_snow_man);
+            if (isHit(snow_sprite, img_snow_man)) {
+                hitJob(snow_sprite);
+            };
             snow_sprite = null;
         }
 
@@ -194,9 +199,26 @@
         return (containerWidth / 2) - (itemWidth / 2);
     };
 
+    //Player (雪だるまを動かせる右の限界位置)
+    function getRightLimitPosition(containerWidth, itemWidth) {
+        return containerWidth - itemWidth;
+    }
+
     function getRandomPosition(colCount, delayPos) {
         return Math.floor(Math.random() * colCount) * delayPos;
     };
+
+    //雪と雪だるまがヒットした際の処理
+    function hitJob(snow_sprite) {
+        ctx.font = "bold 50px";
+        ctx.fillStyle = "red";
+        ctx.fillText("ヒットしました", 100, 160);
+        snow_sprite.index = 2;
+        if (!snow_sprite.soundPlayed) {
+            snow_sprite.sound.play();
+            snow_sprite.soundPlayed = true;
+        }
+    }
 
     //当たり判定
     function isHit(targetA, targetB) {

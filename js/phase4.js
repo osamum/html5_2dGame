@@ -17,11 +17,11 @@
 
     var requestId;
 
-    //キーイベントの取得
-    document.addEventListener("keydown", function () {
-        if (event.keyCode == LEFT_KEY_CODE) {
+    //キーイベントの取得 (キーダウン)
+    document.addEventListener("keydown", function (evnt) {
+        if (evnt.which == LEFT_KEY_CODE) {
             key_value = -3;
-        } else if (event.keyCode == RIGHT_KEY_CODE) {
+        } else if (evnt.which == RIGHT_KEY_CODE) {
             key_value = 3;
         }
     });
@@ -61,6 +61,7 @@
         img_snow_man.onload = function () {
             img_snow_man.x = getCenterPostion(canvas.clientWidth, img_snow_man.width);
             img_snow_man.y = canvas.clientHeight - img_snow_man.width;
+            img_snow_man.limit_rightPosition = getRightLimitPosition(canvas.clientWidth, img_snow_man.width);
             //canvas 上で image を描画
             ctx.drawImage(img_snow_man, img_snow_man.x, img_snow_man.y);
             startScece();
@@ -73,8 +74,11 @@
         //img_snow の y 値を増分
         img_snow.y += 2;
 
-        //img_snow_man の x 値を増分
-        img_snow_man.x += key_value;
+        if ((img_snow_man.x < img_snow_man.limit_rightPosition && key_value > 0)
+         || (img_snow_man.x >= 3 && key_value < 0)) {
+            //img_snow_man の x 値を増分
+            img_snow_man.x += key_value;
+        }
 
         //canvas をクリア
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -89,4 +93,11 @@
     function getCenterPostion(containerWidth, itemWidth) {
         return (containerWidth / 2) - (itemWidth / 2);
     };
+
+    //Player (雪だるまを動かせる右の限界位置)
+    function getRightLimitPosition(containerWidth, itemWidth) {
+        return containerWidth - itemWidth;
+    }
+
+
 })();

@@ -4,6 +4,9 @@
     //Sprite を格納する配列
     var snow_sprites = [];
 
+    //雪が砕けた際のサウンドを格納
+    var sound_snow_crash = null;
+
     //矢印キーのコード
     var LEFT_KEY_CODE = 37;
     var RIGHT_KEY_CODE = 39;
@@ -68,6 +71,11 @@
             that.image = img;
         };
 
+        this.sound = new Audio("/sound/kiiiin1.wav");
+        this.sound.onload = function () {
+            this.soundLoaded = true;
+        }
+
         //Sprite を描画すめメソッド
         that.draw = function () {
             ctx.drawImage(img, _offset_x_pos, 0, width, height, that.x, that.y, width, height);
@@ -114,8 +122,6 @@
     }
 
 
-   
-
     //canvas 内に使用する画像をロード
     function loadAssets() {
         //HTML エレメント上の canvas のインスタンスを取得
@@ -144,7 +150,7 @@
     //Splite に画像がロードされたかどうかを判断
     function loadCheck() {
 
-        if (!img_snow_man.imageLoaded) {
+        if (!img_snow_man.imageLoaded ) {
             //雪だるまの画像のロードが完了していなければループして待つ
             requestId = window.requestAnimationFrame(loadCheck);
         };
@@ -186,6 +192,7 @@
             if (snow_sprite.y > canvas.clientHeight) {
                 snow_sprite.y = getRandomPosition(DRAW_SNOW_COUNT, -50);
                 snow_sprite.index = 0;
+                snow_sprite.soundPlayed = false;
             } else {
                 if (loopCounter == 30 && snow_sprite.index !=2 ) {
                     snow_sprite.index = (snow_sprite.index == 0) ? 1 : 0;
@@ -197,7 +204,6 @@
             //画像を描画
             snow_sprite.draw();
             
-            //当たり判定
             //当たり判定
             if (isHit(snow_sprite, img_snow_man)) {
                 hitJob(snow_sprite);
@@ -231,7 +237,6 @@
         return Math.floor(Math.random() * colCount) * delayPos;
     };
 
-
     //雪と雪だるまがヒットした際の処理
     function hitJob(snow_sprite) {
         ctx.font = "bold 50px";
@@ -244,6 +249,7 @@
         }
     }
 
+
     //当たり判定
     function isHit(targetA, targetB) {
         if ((targetA.x <= targetB.x && targetA.width + targetA.x >= targetB.x)
@@ -251,10 +257,7 @@
 
             if ((targetA.y <= targetB.y && targetA.height + targetA.y >= targetB.y)
                 || (targetA.y >= targetB.y && targetB.y + targetB.height >= targetA.y)) {
-                ctx.font = "bold 50px";
-                ctx.fillStyle = "red";
-                ctx.fillText("ヒットしました", 100, 160);
-                targetA.index = 2;
+                return true;
             }
         }
     }
