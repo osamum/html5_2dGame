@@ -35,6 +35,7 @@
 
     var requestId;
 
+    var bofore_animation_time = 0;
     
     //ゲーム内で動作する Sprite クラス
     var Sprite = function (imgSrc, width, height) {
@@ -174,8 +175,18 @@
         startScece();
     }
 
+    /*
+    function control_fps(method, fps) {
+        if ((window.performance.now() - bofore_animation_time) < (600 * fps)) {
+            bofore_animation_time = window.performance.now;
+            requestId = window.requestAnimationFrame(method);
+        };
+    }
+   */
 
     function startScece() {
+
+
         //canvas をクリア
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -219,6 +230,7 @@
         loopCounter++;
 
         //ループを開始
+        bofore_animation_time = window.performance.now();
         requestId = window.requestAnimationFrame(startScece);
        
     }
