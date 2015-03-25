@@ -93,9 +93,9 @@
         //キーイベントの取得 (キーダウン)
         document.addEventListener("keydown", function (evnt) {
             if (evnt.which == LEFT_KEY_CODE) {
-                key_value = -3;
+                key_value = -5;
             } else if (evnt.which == RIGHT_KEY_CODE) {
-                key_value = 3;
+                key_value = 5;
             }
         });
         
@@ -133,7 +133,7 @@
         for (var i = 0; i < DRAW_SNOW_COUNT; i++) {
             //雪のインスタンスを生成
             var sprite_snow = new Sprite('/img/snowSP.png', SNOW_PIC_SIZE, SNOW_PIC_SIZE);
-            sprite_snow.dy = 1;
+            sprite_snow.dy = 3;
             sprite_snow.dx = DRAW_SNOW_GAP;
             snow_sprites.push(sprite_snow);
             sprite_snow = null;
@@ -150,7 +150,6 @@
 
     //Splite に画像がロードされたかどうかを判断
     function loadCheck() {
-
         if (!img_snow_man.imageLoaded ) {
             //雪だるまの画像のロードが完了していなければループして待つ
             requestId = window.requestAnimationFrame(loadCheck);
@@ -172,67 +171,68 @@
         img_snow_man.x = center_x;
         img_snow_man.y = 0;
         img_snow_man.y = canvas.clientHeight - img_snow_man.width;
+
         startScece();
     }
 
-    /*
-    function control_fps(method, fps) {
-        if ((window.performance.now() - bofore_animation_time) < (600 * fps)) {
-            bofore_animation_time = window.performance.now;
-            requestId = window.requestAnimationFrame(method);
-        };
+    
+    //fps のコントロールコード
+    function control_fps(fps) {
+        var renderFlag = ! (((window.performance.now() - bofore_animation_time) < (600 / fps)) && bofore_animation_time);
+        if (renderFlag) bofore_animation_time = window.performance.now();
+        return renderFlag;
     }
-   */
-
+   
+   
     function startScece() {
+        if(control_fps(48) ) {
+            //canvas をクリア
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-
-        //canvas をクリア
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        if ((img_snow_man.x < img_snow_man.limit_rightPosition && key_value > 0)
-            || (img_snow_man.x >= 3 && key_value < 0)) {
-            //img_snow_man の x 値を増分
-            img_snow_man.x += key_value;
-        }
-
-        var length = snow_sprites.length;
-        for (var i = 0; i < length; i++) {
-            var snow_sprite = snow_sprites[i];
-            //img_snow の y 値(縦位置) が canvas からはみ出たら先頭に戻す
-            if (snow_sprite.y > canvas.clientHeight) {
-                snow_sprite.y = getRandomPosition(DRAW_SNOW_COUNT, -50);
-                snow_sprite.index = 0;
-                snow_sprite.soundPlayed = false;
-            } else {
-                if (loopCounter == 30 && snow_sprite.index !=2 ) {
-                    snow_sprite.index = (snow_sprite.index == 0) ? 1 : 0;
-                }
+            if ((img_snow_man.x < img_snow_man.limit_rightPosition && key_value > 0)
+                || (img_snow_man.x >= 3 && key_value < 0)) {
+                //img_snow_man の x 値を増分
+                img_snow_man.x += key_value;
             }
 
-            //img_snow の y 値を増分
-            snow_sprite.y += snow_sprite.dy;
+            var length = snow_sprites.length;
+            for (var i = 0; i < length; i++) {
+                var snow_sprite = snow_sprites[i];
+                //img_snow の y 値(縦位置) が canvas からはみ出たら先頭に戻す
+                if (snow_sprite.y > canvas.clientHeight) {
+                    snow_sprite.y = getRandomPosition(DRAW_SNOW_COUNT, -50);
+                    snow_sprite.index = 0;
+                    snow_sprite.soundPlayed = false;
+                } else {
+                    if (loopCounter == 30 && snow_sprite.index != 2) {
+                        snow_sprite.index = (snow_sprite.index == 0) ? 1 : 0;
+                    }
+                }
+
+                //img_snow の y 値を増分
+                snow_sprite.y += snow_sprite.dy;
+                //画像を描画
+                snow_sprite.draw();
+
+                //当たり判定
+                if (isHit(snow_sprite, img_snow_man)) {
+                    hitJob(snow_sprite);
+                };
+                snow_sprite = null;
+            }
+
             //画像を描画
-            snow_sprite.draw();
-            
-            //当たり判定
-            if (isHit(snow_sprite, img_snow_man)) {
-                hitJob(snow_sprite);
-            };
-            snow_sprite = null;
+            img_snow_man.draw();
+
+            if (loopCounter == 30) { loopCounter = 0; }
+
+            loopCounter++;
+
+            //ループを開始
+            requestId = window.requestAnimationFrame(startScece);
+        } else {
+            requestId = window.requestAnimationFrame(startScece);
         }
-
-        //画像を描画
-        img_snow_man.draw();
-
-        if (loopCounter == 30) { loopCounter = 0; }
-
-        loopCounter++;
-
-        //ループを開始
-        bofore_animation_time = window.performance.now();
-        requestId = window.requestAnimationFrame(startScece);
-       
     }
 
     //中央の Left 位置を求める関数
