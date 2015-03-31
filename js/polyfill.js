@@ -15,36 +15,26 @@
     //雪の画像サイズ
     var SNOW_PIC_SIZE = 32;
 
-    //雪の降るスピード
-    var SNOW_DOWS_SPEED = 3;
+    //雪ダルマの画像サイズ
+    var SNOW_MAN_PIC_SIZE = 80;
 
     //表示する雪の数
     var DRAW_SNOW_COUNT = 6;
     var DRAW_SNOW_GAP = 55;
-
-    //雪ダルマの画像サイズ
-    var SNOW_MAN_PIC_SIZE = 80;
-
-   
 
     //html ドキュメント上の canvas のインスタンスが格納される
     var canvas;
     // 2d コンテキストのインスタンスが格納される
     var ctx;
 
-    //雪ダルマの image オブジェクトが格納される
+    //雪だるまの image オブジェクトが格納される
     var img_snow_man;
-
-    //雪ダルマの移動量
-    var PLAYER_MOVE_SPEED_R = 5;
-    var PLAYER_MOVE_SPEED_L = -5;
 
     //画面の書き換え数をカウントする
     var loopCounter = 0;
 
     var requestId;
 
-    //前回動いた時間を格納
     var bofore_animation_time = 0;
     
     //ゲーム内で動作する Sprite クラス
@@ -103,9 +93,9 @@
         //キーイベントの取得 (キーダウン)
         document.addEventListener("keydown", function (evnt) {
             if (evnt.which == LEFT_KEY_CODE) {
-                key_value = PLAYER_MOVE_SPEED_L;
+                key_value = -5;
             } else if (evnt.which == RIGHT_KEY_CODE) {
-                key_value = PLAYER_MOVE_SPEED_R;
+                key_value = 5;
             }
         });
         
@@ -120,9 +110,9 @@
         //Canvas へのタッチイベント設定
         canvas.addEventListener("touchstart", function (evnt) {
             if ((screen.width / 2) > evnt.touches[0].clientX) {
-                key_value = PLAYER_MOVE_SPEED_L;
+                key_value = -3;
             } else {
-                key_value = PLAYER_MOVE_SPEED_R;
+                key_value = 3;
             }
         });
 
@@ -188,8 +178,11 @@
     
     //fps のコントロールコード
     function control_fps(fps) {
-        var renderFlag = ! (((window.performance.now() - bofore_animation_time) < (600 / fps)) && bofore_animation_time);
-        if (renderFlag) bofore_animation_time = window.performance.now();
+        //var now_the_time = window.performance.now() || (new Date()).getTime();
+        var now_the_time = (new Date()).getTime()
+            || window.performance.now();
+        var renderFlag = !(((now_the_time - bofore_animation_time) < (600 / fps)) && bofore_animation_time);
+        if (renderFlag) bofore_animation_time = now_the_time;
         return renderFlag;
     }
    
