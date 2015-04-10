@@ -25,8 +25,6 @@
     //雪ダルマの画像サイズ
     var SNOW_MAN_PIC_SIZE = 80;
 
-   
-
     //html ドキュメント上の canvas のインスタンスが格納される
     var canvas;
     // 2d コンテキストのインスタンスが格納される
